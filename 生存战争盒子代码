@@ -1,0 +1,1843 @@
+这为部分代码
+--程序启动时会执行的事件
+
+--退出程序
+function 退出程序()
+  if this.packageName == "com.androlua" or this.packageName == "com.xnm.FusionApp" then
+    activity.finish()
+  else
+    System.exit(0)
+  end
+end
+--新建一个退出程序函数，勿删！
+--不然用“退出程序()”会报错，这两句话可以删了
+
+--首次启动侧滑。
+
+--首次启动弹出窗口的代码
+function getData(name,key)
+  local data=this.getApplicationContext().getSharedPreferences(name,0).getString(key,nil)
+  return data
+end
+
+function putData(name,key,value)
+  this.getApplicationContext().getSharedPreferences(name,0).edit().putString(key,value).apply()
+  return true
+end
+
+--首次安装程序启动仅显示一次的布局
+if not getData("ghost","99") then--99这两个号码要一致，才会只显示一次，当然也可以改成你的
+  putData("ghost","99","显示一次")--99这两个号码要一致，才会只显示一次，当然也可以改成你的
+  activity.newActivity('ghost.lua')--图片以及布局代码，都在工程文件里面
+end
+
+
+
+
+--更新
+
+require "import"
+import "ppp"
+
+
+
+--检测网络
+sjy = 1000
+function junyang()
+task(1,function()
+if (sjy > 1) then
+sjy=sjy-1
+local wl=activity.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE).getActiveNetworkInfo(); 
+if wl== nil then
+退出页面()
+end
+else
+end
+junyang()
+end)
+end
+junyang()
+
+
+--自动切换主题颜色
+
+--程序启动时会执行的事件
+import "theme"
+--初始化主题
+setThemeOnUI(false)
+--储存夜间模式状态留作判断用
+isNight=getSelectedTheme().night
+--当从设置主题页面回到主页面时会执行
+function onResume()
+  --处理夜间模式变化，重新设置主题
+  local now=getSelectedTheme().night
+  if not (now==isNight) then
+    setThemeOnUI(true)
+    isNight=now
+  else
+    setThemeOnUI(false)
+  end
+  --夜间模式适配举例，实际使用时需要在「收到新标题」事件添加相关代码
+  if getNightMode() == true then
+    加载Js([[
+    var css = document.createElement('link');
+    css.id = 'nightmode';
+    css.rel = 'stylesheet';
+    css.href = 'data:text/css,*{color:white}';
+    document.body.appendChild(css);
+    ]])
+  else
+    加载Js([[document.body.removeChild(document.getElementById("nightmode"))]])
+  end
+end
+
+--程序启动时会执行的事件
+
+--导入自制封装中文函数
+require "mods.shamrock"
+
+--隐藏顶栏
+toolbar.parent.setVisibility(View.GONE)
+
+--布局
+shamrock=
+  {
+    LinearLayout;
+    orientation='vertical';--重力属性
+    layout_width='fill';--布局宽度
+    layout_height='fill';--布局高度
+    --顶栏布局
+    --左上角文本与右上角头像各分20%w,中间4个标题以50%w划分,如果不适配请自行更改替换
+    {
+      LinearLayout;
+      orientation='horizontal';--重力属性
+      layout_width='fill';--布局宽度
+      layout_height='60dp';--布局高度
+      background='#FFFFFFFF';--布局背景颜色(或者图片路径)
+      {
+        LinearLayout;
+        gravity='center';--重力属性
+        layout_width='20%w';--布局宽度
+        layout_height='fill';--布局高度
+        {
+          TextView;--文本控件
+          layout_width='fill';--文本宽度
+          layout_height='fill';--文本高度
+          gravity='center';--重力属性
+          textColor='#FF41CBF7';--文字颜色
+          text='生存战争&盒子';--显示的文字
+          textSize='8dp';--文字大小
+          layout_marginTop='10dp';--布局顶距
+          layout_marginRight='4%w';--布局右距
+        };
+      };
+      {
+        LinearLayout;
+        id="shouye",
+        gravity='center';--重力属性
+        layout_width='12.5%w';--布局宽度
+        layout_height='fill';--布局高度
+        {
+          TextView;--文本控件
+          id="a1",
+          layout_width='fill';--文本宽度
+          layout_height='fill';--文本高度
+          gravity='center';--重力属性
+          textColor='#FF000000';--文字颜色
+          layout_marginTop='10dp';--布局顶距
+          text='首页';--显示的文字
+          textSize='15sp';--文字大小
+        };
+      };
+      {
+        LinearLayout;
+        id="liulan",
+        gravity='center';--重力属性
+        layout_width='12.5%w';--布局宽度
+        layout_height='fill';--布局高度
+        layout_marginLeft='4%w';--布局左距
+        {
+          TextView;--文本控件
+          id="a2",
+          layout_width='fill';--文本宽度
+          layout_height='fill';--文本高度
+          gravity='center';--重力属性
+          textColor='#FF6A6A6A';--文字颜色
+          layout_marginTop='10dp';--布局顶距
+          text='浏览';--显示的文字
+          textSize='15sp';--文字大小
+        };
+      };
+      {
+        LinearLayout;
+        id="yuedu",
+        gravity='center';--重力属性
+        layout_width='12.5%w';--布局宽度
+        layout_height='fill';--布局高度
+        layout_marginLeft='4%w';--布局左距
+        {
+          TextView;--文本控件
+          id="a3",
+          layout_width='fill';--文本宽度
+          layout_height='fill';--文本高度
+          gravity='center';--重力属性
+          textColor='#FF6A6A6A';--文字颜色
+          layout_marginTop='10dp';--布局顶距
+          text='百科';--显示的文字
+          textSize='15sp';--文字大小
+        };
+      };
+      {
+        LinearLayout;
+        id="fanyi",
+        gravity='center';--重力属性
+        layout_width='12.5%w';--布局宽度
+        layout_height='fill';--布局高度
+        layout_marginLeft='4%w';--布局左距
+        {
+          TextView;--文本控件
+          id="a4",
+          layout_width='fill';--文本宽度
+          layout_height='fill';--文本高度
+          gravity='center';--重力属性
+          textColor='#FF6A6A6A';--文字颜色
+          layout_marginTop='10dp';--布局顶距
+          text='我的';--显示的文字
+          textSize='15sp';--文字大小
+          onClick=function()
+            弹出消息("未开发")
+            end,
+        };
+      };
+      {
+        LinearLayout;
+        gravity='center';--重力属性
+        layout_width='20%w';--布局宽度
+        layout_height='fill';--布局高度
+        {
+          CircleImageView;--圆形图片控件
+          src='https://ws3.sinaimg.cn/large/005BYqpgly1fzlak0htilj30rs13anpd.jpg';--图片路径
+          layout_gravity='center';--重力属性
+          layout_width='30dp';--图片宽度
+          layout_height='30dp';--图片高度
+          layout_marginTop='10dp';--布局顶距
+        };
+      };
+    };
+    {
+      PageView;--滑动视图
+      layout_weight="1";--剩余属性
+      layout_width='fill';--布局宽度
+      layout_height='fill';--布局高度
+      id="hua";
+      pages={
+        --首页布局
+        {
+          LinearLayout;
+          orientation='vertical';--重力属性
+          layout_width='fill';--布局宽度
+          layout_height='fill';--布局高度
+          {
+            ScrollView,--纵向滚动
+            layout_width='fill';--宽
+            layout_height='fill';--高
+            verticalScrollBarEnabled=false;--隐藏纵向滚动条
+            {
+              LinearLayout;
+              gravity='center';--重力属性
+              orientation='vertical';--重力属性
+              layout_width='fill';--布局宽度
+              layout_height='20dp';--布局高度
+              --第一个卡片
+              {
+                CardView;--卡片控件
+                layout_margin='10dp';--卡片边距
+                elevation='8dp';--阴影属性
+                layout_width='fill';--卡片宽度
+                CardBackgroundColor='#FF342DF5';--卡片背景颜色
+                layout_height='160dp';--卡片高度
+                radius='15dp';--卡片圆角
+                {
+                  CardView;--卡片控件
+                  layout_margin='10dp';--卡片边距
+                  elevation='8dp';--阴影属性
+                  layout_width='22%w';--卡片宽度
+                  CardBackgroundColor='#FFFFFFFF';--卡片背景颜色
+                  layout_height='5%h';--卡片高度
+                  radius='15dp';--卡片圆角
+                  layout_marginTop='110dp';--布局顶距
+                  layout_marginLeft='5%w';--布局左距
+                  {
+                    TextView;--文本控件
+                    layout_width='fill';--文本宽度
+                    layout_height='fill';--文本高度
+                    gravity='center';--重力属性
+                    textColor='#FF342DF5';--文字颜色
+                    text='使用说明';--显示的文字
+                    textSize='15sp';--文字大小
+                    onClick=function()
+对话框()
+.设置标题("SC盒子说明")
+.设置消息("盒子内所有资源下载都是通过系统下载，下载路径是/storage/emulated/0/Download/ 本软件里面的选项有些是点击文字，不点否则无效。要是页面滑动不了了可疯狂点击重置页面按钮即可。侧滑栏左边滑出。v8 程序设计\nBy：Aqua゛")
+.设置积极按钮("确定",function()
+  显示消息("点击了确定")
+end)
+.设置消极按钮("取消")
+.显示()
+end,
+                  };
+                };
+                {
+                  CardView;--卡片控件
+                  layout_margin='10dp';--卡片边距
+                  elevation='8dp';--阴影属性
+                  layout_width='22%w';--卡片宽度
+                  CardBackgroundColor='#F275F500';--卡片背景颜色
+                  layout_height='5%h';--卡片高度
+                  radius='15dp';--卡片圆角
+                  layout_marginTop='110dp';--布局顶距
+                  layout_marginLeft='35%w';--布局左距
+                  {
+                    TextView;--文本控件
+                    layout_width='fill';--文本宽度
+                    layout_height='fill';--文本高度
+                    gravity='center';--重力属性
+                    textColor='#FFFFFF';--文字颜色
+                    text='联系我们';--显示的文字
+                    textSize='15sp';--文字大小
+                    onClick=function()
+                      加QQ群(1075498970)弹出消息("有想和我一起做盒子和其他App的可加入我们的工作室。")
+                      end,
+                  };
+                };
+                {
+                  CardView;--卡片控件
+                  layout_margin='10dp';--卡片边距
+                  elevation='8dp';--阴影属性
+                  layout_width='22%w';--卡片宽度
+                  CardBackgroundColor='#FFFFFFFF';--卡片背景颜色
+                  layout_height='5%h';--卡片高度
+                  radius='15dp';--卡片圆角
+                  layout_marginTop='110dp';--布局顶距
+                  layout_marginLeft='65%w';--布局左距
+                  {
+                    TextView;--文本控件
+                    layout_width='fill';--文本宽度
+                    layout_height='fill';--文本高度
+                    gravity='center';--重力属性
+                    textColor='#FF41CBF7';--文字颜色
+                    text='分享盒子';--显示的文字
+                    textSize='15sp';--文字大小
+                    onClick=function()
+                      分享文本("哈喽！大家好我正在使用战争战争&盒子，有兴趣的点击链接下载吧！https://dmtuangdui.lanzous.com/b01i14e5e 密码:1s1x")弹出消息("分享使人快乐。")
+                      end,
+                  };
+                };
+                {
+                  LinearLayout;
+                  gravity='center';--重力属性
+                  orientation='horizontal';--重力属性
+                  layout_width='fill';--布局宽度
+                  layout_height='160dp';--布局高度
+                  background='#FF41CBF7';--布局背景颜色(或者图片路径)
+                  {
+                    TextView;--文本控件
+                    layout_width='fill';--文本宽度
+                    layout_height='fill';--文本高度
+                    gravity='left|top';--重力属性
+                    textColor='#FFFFFF';--文字颜色
+                    layout_margin='20dp';--布局边距
+                    text='Speedy Intelligence\n极速智能';--显示的文字
+                    textSize='25sp';--文字大小
+                  };
+                };
+              };
+--第二个卡片
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_marginTop='10dp';--布局顶距
+layout_marginLeft='10dp';--布局左距
+gravity='left';--重力属性
+layout_width='100%w';--布局宽度
+{
+TextView;--文本控件
+gravity='left';--重力属性
+textColor='#FF000000';--文字颜色
+text='SC相关平台';--显示的文字
+textSize='20sp';--文字大小
+layout_marginLeft='10dp';--布局左距
+};
+};
+{
+CardView;--卡片控件
+layout_margin='10dp';--卡片边距
+elevation='2dp';--阴影属性
+layout_width='fill';--卡片宽度
+CardBackgroundColor='#FfF7FBF7';--卡片背景颜色
+layout_height='120dp';--卡片高度
+radius='15dp';--卡片圆角
+{
+HorizontalScrollView,--横向滚动
+layout_width='fill';--宽
+layout_height='fill';--高
+{
+LinearLayout;
+orientation='horizontal';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+{
+LinearLayout;
+gravity='left';--重力属性
+orientation='horizontal';--重力属性
+layout_width='fill';--布局宽度
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_width='60dp';--布局宽度
+layout_height='120dp';--布局高度
+layout_marginTop='15dp';--布局顶距
+layout_margin='15dp';--布局边距
+{
+ImageView;--图片控件
+src='icon/baidu_tieba.png';--图片路径
+layout_width='60dp';--图片宽度
+layout_height='60dp';--图片高度
+scaleType='fitXY';--图片显示类型
+layout_marginTop='3dp';--布局顶距
+layout_gravity='center';--重力属性
+ColorFilter='#00FFAB91',--图片着色
+};
+{
+TextView;--文本控件
+layout_marginTop='5dp';--布局顶距
+layout_gravity='center';--重力属性
+textColor='#FF6A6A6A';--文字颜色
+text='百度贴吧';--显示的文字
+textSize='10sp';--文字大小
+onClick=function()
+  进入子页面("7",{链接="https://tieba.baidu.com/f/good?kw=%C9%FA%B4%E6%D5%BD%D5%F9&cid=6&referer=wap.sogou.com&pn=0&"})
+end,
+};
+};
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_width='60dp';--布局宽度
+layout_height='120dp';--布局高度
+layout_marginTop='15dp';--布局顶距
+layout_margin='15dp';--布局边距
+{
+ImageView;--图片控件
+src='icon/jd.png';--图片路径
+layout_width='60dp';--图片宽度
+layout_height='60dp';--图片高度
+scaleType='fitXY';--图片显示类型
+layout_marginTop='3dp';--布局顶距
+layout_gravity='center';--重力属性
+ColorFilter='#00FFAB91',--图片着色
+};
+{
+TextView;--文本控件
+layout_marginTop='5dp';--布局顶距
+layout_gravity='center';--重力属性
+textColor='#FF6A6A6A';--文字颜色
+text='生存战争中国玩家联盟';--显示的文字
+textSize='10sp';--文字大小
+onClick=function()
+加QQ群(478066941)
+end,
+};
+};
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_width='60dp';--布局宽度
+layout_height='120dp';--布局高度
+layout_marginTop='15dp';--布局顶距
+layout_margin='15dp';--布局边距
+{
+ImageView;--图片控件
+src='icon/card_news.png';--图片路径
+layout_width='60dp';--图片宽度
+layout_height='60dp';--图片高度
+scaleType='fitXY';--图片显示类型
+layout_marginTop='3dp';--布局顶距
+layout_gravity='center';--重力属性
+ColorFilter='#00FFAB91',--图片着色
+};
+{
+TextView;--文本控件
+layout_marginTop='5dp';--布局顶距
+layout_gravity='center';--重力属性
+textColor='#FF6A6A6A';--文字颜色
+text='SC中文社区';--显示的文字
+textSize='10sp';--文字大小
+onClick=function()
+  进入子页面("7",{链接="http://m.schub.top/com"})
+  end,
+};
+};
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_width='60dp';--布局宽度
+layout_height='120dp';--布局高度
+layout_marginTop='15dp';--布局顶距
+layout_margin='15dp';--布局边距
+{
+ImageView;--图片控件
+src='icon/video.png';--图片路径
+layout_width='60dp';--图片宽度
+layout_height='60dp';--图片高度
+scaleType='fitXY';--图片显示类型
+layout_marginTop='3dp';--布局顶距
+layout_gravity='center';--重力属性
+ColorFilter='#00FFAB91',--图片着色
+};
+{
+TextView;--文本控件
+layout_marginTop='5dp';--布局顶距
+layout_gravity='center';--重力属性
+textColor='#FF6A6A6A';--文字颜色
+text='SCMOD公测中心';--显示的文字
+textSize='10sp';--文字大小
+onClick=function()
+  加QQ群(1076597286)
+  end,
+};
+};
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_width='60dp';--布局宽度
+layout_height='120dp';--布局高度
+layout_marginTop='15dp';--布局顶距
+layout_margin='15dp';--布局边距
+{
+ImageView;--图片控件
+src='icon/musicuu.png';--图片路径
+layout_width='60dp';--图片宽度
+layout_height='60dp';--图片高度
+scaleType='fitXY';--图片显示类型
+layout_marginTop='3dp';--布局顶距
+layout_gravity='center';--重力属性
+ColorFilter='#00FFAB91',--图片着色
+};
+{
+TextView;--文本控件
+layout_marginTop='5dp';--布局顶距
+layout_gravity='center';--重力属性
+textColor='#FF6A6A6A';--文字颜色
+text='SC-APImod教研中心';--显示的文字
+textSize='10sp';--文字大小
+onClick=function()
+  加QQ群(638052328)
+  end,
+};
+};
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_width='60dp';--布局宽度
+layout_height='120dp';--布局高度
+layout_marginTop='15dp';--布局顶距
+layout_margin='15dp';--布局边距
+{
+ImageView;--图片控件
+src='icon/settings_1.png';--图片路径
+layout_width='60dp';--图片宽度
+layout_height='60dp';--图片高度
+scaleType='fitXY';--图片显示类型
+layout_marginTop='3dp';--布局顶距
+layout_gravity='center';--重力属性
+ColorFilter='#00FFAB91',--图片着色
+};
+{
+TextView;--文本控件
+layout_marginTop='5dp';--布局顶距
+layout_gravity='center';--重力属性
+textColor='#FF6A6A6A';--文字颜色
+text='SMTmod制作交流';--显示的文字
+textSize='10sp';--文字大小
+onClick=function()
+  加QQ群(302758716)
+  end,
+};
+};
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_width='60dp';--布局宽度
+layout_height='120dp';--布局高度
+layout_marginTop='15dp';--布局顶距
+layout_margin='15dp';--布局边距
+{
+ImageView;--图片控件
+src='icon/video_1.png';--图片路径
+layout_width='60dp';--图片宽度
+layout_height='60dp';--图片高度
+scaleType='fitXY';--图片显示类型
+layout_marginTop='3dp';--布局顶距
+layout_gravity='center';--重力属性
+ColorFilter='#00FFAB91',--图片着色
+};
+{
+TextView;--文本控件
+layout_marginTop='5dp';--布局顶距
+layout_gravity='center';--重力属性
+textColor='#FF6A6A6A';--文字颜色
+text='SC2API插件官方交流';--显示的文字
+textSize='10sp';--文字大小
+onClick=function()
+  加QQ群(189446468)
+  end,
+};
+};
+};
+};
+};
+};
+--第三个卡片
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_margin='10dp';--布局边距
+gravity='left';--重力属性
+layout_width='100%w';--布局宽度
+{
+TextView;--文本控件
+gravity='left';--重力属性
+textColor='#FF000000';--文字颜色
+text='SC资源大全';--显示的文字
+textSize='20sp';--文字大小
+layout_marginLeft='20dp';--布局左距
+};
+};
+{
+HorizontalScrollView,--横向滚动
+layout_width='fill';--宽
+layout_height='fill';--高
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+{
+LinearLayout;
+gravity='center';--重力属性
+orientation='horizontal';--重力属性
+layout_width='fill';--布局宽度
+layout_marginTop='-2%w';--布局顶距
+{
+CardView;--卡片控件
+layout_margin='10dp';--卡片边距
+elevation='5dp';--阴影属性
+layout_width='150dp';--卡片宽度
+CardBackgroundColor='#fff6f6f6';--卡片背景颜色
+layout_height='60dp';--卡片高度
+radius='15dp';--卡片圆角
+{
+LinearLayout;
+gravity='center';--重力属性
+orientation='horizontal';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+background='shouye1.png';--布局背景颜色(或者图片路径)
+{
+TextView;--文本控件
+gravity='center';--重力属性
+textColor='#FFFFFFFF';--文字颜色
+text='MOD';--显示的文字
+textSize='15sp';--文字大小
+onClick=function()
+  进入子页面("19",{链接="http://m.schub.top/com/mods/viewlist"})
+  end,
+};
+};
+};
+{
+CardView;--卡片控件
+layout_margin='10dp';--卡片边距
+elevation='5dp';--阴影属性
+layout_width='150dp';--卡片宽度
+CardBackgroundColor='#fff6f6f6';--卡片背景颜色
+layout_height='60dp';--卡片高度
+radius='15dp';--卡片圆角
+{
+LinearLayout;
+gravity='center';--重力属性
+orientation='horizontal';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+background='shouye2.png';--布局背景颜色(或者图片路径)
+{
+TextView;--文本控件
+gravity='center';--重力属性
+textColor='#FFFFFFFF';--文字颜色
+text='材质';--显示的文字
+textSize='15sp';--文字大小
+onClick=function()
+进入子页面("19",{链接="https://www.yuque.com/u589148/sc/dnqnhk"})
+end,
+};
+};
+};
+{
+CardView;--卡片控件
+layout_margin='10dp';--卡片边距
+elevation='5dp';--阴影属性
+layout_width='150dp';--卡片宽度
+CardBackgroundColor='#fff6f6f6';--卡片背景颜色
+layout_height='60dp';--卡片高度
+radius='15dp';--卡片圆角
+{
+LinearLayout;
+gravity='center';--重力属性
+orientation='horizontal';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+background='shouye3.png';--布局背景颜色(或者图片路径)
+{
+TextView;--文本控件
+gravity='center';--重力属性
+textColor='#FFFFFFFF';--文字颜色
+text='皮肤';--显示的文字
+textSize='15sp';--文字大小
+onClick=function()
+  进入子页面("19",{链接="https://www.yuque.com/u589148/sc/rmt9al"})
+  end,
+};
+};
+};
+{
+CardView;--卡片控件
+layout_margin='10dp';--卡片边距
+elevation='5dp';--阴影属性
+layout_width='150dp';--卡片宽度
+CardBackgroundColor='#fff6f6f6';--卡片背景颜色
+layout_height='60dp';--卡片高度
+radius='15dp';--卡片圆角
+{
+LinearLayout;
+gravity='center';--重力属性
+orientation='horizontal';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+background='shouye4.png';--布局背景颜色(或者图片路径)
+{
+TextView;--文本控件
+gravity='center';--重力属性
+textColor='#FFFFFFFF';--文字颜色
+text='字体';--显示的文字
+textSize='15sp';--文字大小
+onClick=function()
+  进入子页面("19",{链接="https://www.yuque.com/u589148/sc/lcdrbv"})
+  end,
+};
+};
+};
+{
+CardView;--卡片控件
+layout_margin='10dp';--卡片边距
+elevation='5dp';--阴影属性
+layout_width='150dp';--卡片宽度
+CardBackgroundColor='#fff6f6f6';--卡片背景颜色
+layout_height='60dp';--卡片高度
+radius='15dp';--卡片圆角
+{
+LinearLayout;
+gravity='center';--重力属性
+orientation='horizontal';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+background='shouye6.png';--布局背景颜色(或者图片路径)
+{
+TextView;--文本控件
+gravity='center';--重力属性
+textColor='#FFFFFFFF';--文字颜色
+text='种子';--显示的文字
+textSize='15sp';--文字大小
+onClick=function()
+  进入子页面("19",{链接="http://m.yxdown.com/sjarticle/306932.html"})
+  end,
+};
+};
+};
+{
+CardView;--卡片控件
+layout_margin='10dp';--卡片边距
+elevation='5dp';--阴影属性
+layout_width='150dp';--卡片宽度
+CardBackgroundColor='#fff6f6f6';--卡片背景颜色
+layout_height='60dp';--卡片高度
+radius='15dp';--卡片圆角
+{
+LinearLayout;
+gravity='center';--重力属性
+orientation='horizontal';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+background='shouye7.png';--布局背景颜色(或者图片路径)
+{
+TextView;--文本控件
+gravity='center';--重力属性
+textColor='#FFFFFFFF';--文字颜色
+text='存档';--显示的文字
+textSize='15sp';--文字大小
+onClick=function()
+  进入子页面("19",{链接="http://m.kuaihou.com/cd/shengcunzhanzhengcundang/"})
+  end,
+};
+};
+};
+{
+CardView;--卡片控件
+layout_margin='10dp';--卡片边距
+elevation='5dp';--阴影属性
+layout_width='150dp';--卡片宽度
+CardBackgroundColor='#fff6f6f6';--卡片背景颜色
+layout_height='60dp';--卡片高度
+radius='15dp';--卡片圆角
+{
+LinearLayout;
+gravity='center';--重力属性
+orientation='horizontal';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+background='shouye8.png';--布局背景颜色(或者图片路径)
+{
+TextView;--文本控件
+gravity='center';--重力属性
+textColor='#FFFFFFFF';--文字颜色
+text='游戏';--显示的文字
+textSize='15sp';--文字大小
+onClick=function()
+  进入子页面("40")弹出消息("尽情挑选你喜欢的版本吧。")
+  end,
+};
+};
+};
+};
+};
+};
+--第四个卡片
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_margin='10dp';--布局边距
+gravity='left';--重力属性
+layout_width='100%w';--布局宽度
+{
+TextView;--文本控件
+gravity='left';--重力属性
+textColor='#FF000000';--文字颜色
+text='SC最新热点';--显示的文字
+textSize='20sp';--文字大小
+layout_marginLeft='20dp';--布局左距
+};
+};
+{
+LinearLayout;
+layout_width='fill';--布局宽度
+layout_height='240dp';--布局高度
+{
+PageView;
+layout_weight="1";
+id="hd";
+pages={
+{
+LinearLayout;
+gravity='center';--重力属性
+orientation='vertical';--重力属性
+{
+CardView;--卡片控件
+layout_margin='10dp';--卡片边距
+elevation='8dp';--阴影属性
+layout_width='fill';--卡片宽度
+CardBackgroundColor='#FFFFFF';--卡片背景颜色
+layout_height='200dp';--卡片高度
+radius='15dp';--卡片圆角
+{
+ImageView;--图片控件
+layout_width='fill';--图片宽度
+layout_height='200dp';--图片高度
+scaleType='fitXY';--图片显示类型
+background='drawable/shouye.png';--布局背景颜色(或者图片路径)
+onClick=function()
+  进入子页面("26",{链接="http://tieba.baidu.com/p/7197967039#/"})
+  end,
+  
+};
+};
+};
+{
+LinearLayout;
+gravity='center';--重力属性
+orientation='vertical';--重力属性
+{
+CardView;--卡片控件
+layout_margin='10dp';--卡片边距
+elevation='8dp';--阴影属性
+layout_width='fill';--卡片宽度
+CardBackgroundColor='#FFFFFF';--卡片背景颜色
+layout_height='200dp';--卡片高度
+radius='15dp';--卡片圆角
+{
+ImageView;--图片控件
+layout_width='fill';--图片宽度
+layout_height='200dp';--图片高度
+scaleType='fitXY';--图片显示类型
+background='drawable/shouye2.png';--布局背景颜色(或者图片路径)
+onClick=function()
+  进入子页面("26",{链接="https://www.bilibili.com/video/BV1vX4y1P7jp?from=search&seid=13071046943689329354"})
+  end,
+};
+};
+};
+{
+LinearLayout;
+gravity='center';--重力属性
+orientation='vertical';--重力属性
+{
+CardView;--卡片控件
+layout_margin='10dp';--卡片边距
+elevation='8dp';--阴影属性
+layout_width='fill';--卡片宽度
+CardBackgroundColor='#FFFFFF';--卡片背景颜色
+layout_height='200dp';--卡片高度
+radius='15dp';--卡片圆角
+{
+ImageView;--图片控件
+layout_width='fill';--图片宽度
+layout_height='200dp';--图片高度
+scaleType='fitXY';--图片显示类型
+background='drawable/shouye3.png';--布局背景颜色(或者图片路径)
+onClick=function()
+  进入子页面("26",{链接=""})
+  end,
+};
+};
+};
+};
+};
+};
+--第五个卡片
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_margin='10dp';--布局边距
+gravity='left';--重力属性
+layout_width='100%w';--布局宽度
+{
+TextView;--文本控件
+gravity='left';--重力属性
+textColor='#FF000000';--文字颜色
+text='其他';--显示的文字
+textSize='20sp';--文字大小
+layout_marginLeft='20dp';--布局左距
+};
+};
+{
+LinearLayout;
+orientation='horizontal';--重力属性
+layout_margin='10dp';--布局边距
+{
+CardView;--卡片控件
+layout_margin='10dp';--卡片边距
+elevation='2dp';--阴影属性
+layout_width='25%w';--卡片宽度
+CardBackgroundColor='#FFFFFFFF';--卡片背景颜色
+layout_height='25%w';--卡片高度
+radius='10dp';--卡片圆角
+{
+LinearLayout;
+id="zy",
+gravity='center';--重力属性
+orientation='vertical';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+onClick=function()
+  弹出消息("还未开发")
+  end,
+{
+ImageView;--图片控件
+src='drawable/movie_96x96.png';--图片路径
+layout_width='50dp';--图片宽度
+layout_height='50dp';--图片高度
+scaleType='fitXY';--图片显示类型
+ColorFilter="#FF6A6A6A";--图片着色
+};
+{
+TextView;--文本控件
+layout_marginTop='3dp';--布局顶距
+textColor='#FF6A6A6A';--文字颜色
+text='MOD导入';--显示的文字
+textSize='15sp';--文字大小
+};
+};
+};
+{
+CardView;--卡片控件
+layout_margin='10dp';--卡片边距
+elevation='2dp';--阴影属性
+layout_width='25%w';--卡片宽度
+CardBackgroundColor='#FFFFFFFF';--卡片背景颜色
+layout_height='25%w';--卡片高度
+radius='10dp';--卡片圆角
+{
+LinearLayout;
+id="zc",
+gravity='center';--重力属性
+orientation='vertical';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+onClick=function()
+  加载网页("https://ws3.sinaimg.cn/large/005BYqpgly1fz8krbin35j30u00u0td8.jpg")
+end,
+{
+ImageView;--图片控件
+src='drawable/emoticon_cool_96x96.png';--图片路径
+layout_width='50dp';--图片宽度
+layout_height='50dp';--图片高度
+scaleType='fitXY';--图片显示类型
+ColorFilter="#FF6A6A6A";--图片着色
+};
+{
+TextView;--文本控件
+layout_marginTop='3dp';--布局顶距
+textColor='#FF6A6A6A';--文字颜色
+text='重置页面';--显示的文字
+textSize='15sp';--文字大小
+};
+};
+};
+{
+CardView;--卡片控件
+layout_margin='10dp';--卡片边距
+elevation='2dp';--阴影属性
+layout_width='25%w';--卡片宽度
+CardBackgroundColor='#FFFFFFFF';--卡片背景颜色
+layout_height='25%w';--卡片高度
+radius='10dp';--卡片圆角
+{
+LinearLayout;
+id="zi",
+gravity='center';--重力属性
+orientation='vertical';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+onClick=function()
+  进入子页面("38")
+  end,
+{
+ImageView;--图片控件
+src='drawable/twitter_96x96.png';--图片路径
+layout_width='50dp';--图片宽度
+layout_height='50dp';--图片高度
+scaleType='fitXY';--图片显示类型
+ColorFilter="#FF6A6A6A";--图片着色
+};
+{
+TextView;--文本控件
+layout_marginTop='3dp';--布局顶距
+textColor='#FF6A6A6A';--文字颜色
+text='下载管理';--显示的文字
+textSize='15sp';--文字大小
+};
+};
+};
+};
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_margin='10dp';--布局边距
+gravity='left';--重力属性
+layout_width='100%w';--布局宽度
+{
+TextView;--文本控件
+gravity='left';--重力属性
+textColor='#FF000000';--文字颜色
+text='软件说明';--显示的文字
+textSize='20sp';--文字大小
+layout_marginLeft='20dp';--布局左距
+};
+};
+{
+LinearLayout;
+gravity='center';--重力属性
+orientation='horizontal';--重力属性
+layout_margin='10dp';--布局边距
+{
+CardView;--卡片控件
+layout_margin='10dp';--卡片边距
+elevation='4dp';--阴影属性
+layout_width='90%w';--卡片宽度
+CardBackgroundColor='#FFFFFF';--卡片背景颜色
+layout_height='100dp';--卡片高度
+radius='10dp';--卡片圆角
+{
+LinearLayout;
+gravity='center';--重力属性
+orientation='horizontal';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+{
+ImageView;--图片控件
+src='drawable/logo1.png';--图片路径
+layout_width='40dp';--图片宽度
+layout_height='40dp';--图片高度
+scaleType='fitXY';--图片显示类型
+ColorFilter="#FF342DF5";--图片着色
+};
+{
+TextView;--文本控件
+textColor='#FF342DF5';--文字颜色
+text='Aqua゛\n禁止盗版本软件，且本软件引用了他人代码（已征求同意），但是由本人修改而来。';--显示的文字
+textSize='15dp';--文字大小
+};
+};
+};
+};
+};
+};
+};--首页布局
+--浏览布局
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+background='#FFFFFFFF';--布局背景颜色(或者图片路径)
+--顶部图片布局
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_width='fill';--布局宽度
+layout_height='30%h';--布局高度
+background='img/tp.png';--布局背景颜色(或者图片路径)
+layout_marginTop='4.5%h';--布局顶距
+};
+{
+LinearLayout;
+layout_gravity='center';--重力属性
+orientation='vertical';--重力属性
+layout_width='30%w';--布局宽度
+layout_height='6%h';--布局高度
+layout_marginTop='-20dp';--布局顶距
+background='#00FFFFFF';--布局背景颜色(或者图片路径)
+--插入Google LOGO
+{
+ImageView;--图片控件
+src='img/google.png';--图片路径
+layout_width='30%w';--图片宽度
+layout_height='6%h';--图片高度
+scaleType='fitXY';--图片显示类型
+};
+};
+{
+LinearLayout;
+orientation='horizontal';--重力属性
+layout_width='fill';--布局宽度
+layout_height='60dp';--布局高度
+layout_marginTop='10dp';--布局底距
+{
+CardView;--卡片控件
+layout_margin='10dp';--卡片边距
+layout_gravity='center';--重力属性
+elevation='2dp';--阴影属性
+layout_width='fill';--卡片宽度
+CardBackgroundColor='#FFFFFFFF';--卡片背景颜色
+layout_height='40dp';--卡片高度
+{
+EditText;--编辑框控件
+layout_marginLeft='3%w';--布局左距
+layout_marginTop='-4dp';--布局底距
+layout_width='fill';--编辑框宽度
+layout_height='50dp';--编辑框高度
+textSize='15sp';--文字大小
+singleLine=true;--设置单行输入
+textColor='#FF000000';--输入文字的颜色
+background='#FFFFFFFF';--布局背景颜色(或者图片路径)
+Hint='输入点什么吧...（暂时无法使用）';--设置编辑框为空时的提示文字
+};
+};
+};
+--中间四个布局
+{
+LinearLayout;
+orientation='horizontal';--重力属性
+layout_width='fill';--布局宽度
+layout_height='0%h';--布局高度
+layout_marginTop='15dp';--布局顶距
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_width='12%w';--布局宽度
+layout_height='12%h';--布局高度
+layout_marginLeft='17%w';--布局左距
+{
+LinearLayout;
+id="baidu";
+orientation='vertical';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+{
+ImageView;--图片控件
+src='img/Baidu.png';--图片路径
+layout_width='12%w';--图片宽度
+layout_height='12%w';--图片高度
+scaleType='fitXY';--图片显示类型
+};
+{
+TextView;--文本控件
+layout_width='12%w';--文本宽度
+layout_height='12%w';--文本高度
+gravity='center';--重力属性
+textColor='#FF4A4266';--文字颜色
+text='百度';--显示的文字
+textSize='12sp';--文字大小
+layout_marginTop='5dp';--布局顶距
+};
+};
+};
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_width='12%w';--布局宽度
+layout_height='12%h';--布局高度
+layout_marginLeft='6%w';--布局底距
+{
+LinearLayout;
+id="zj";
+orientation='vertical';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+{
+ImageView;--图片控件
+src='img/lishi.png';--图片路径
+layout_width='12%w';--图片宽度
+layout_height='12%w';--图片高度
+scaleType='fitXY';--图片显示类型
+};
+{
+TextView;--文本控件
+layout_width='12%w';--文本宽度
+layout_height='12%w';--文本高度
+gravity='center';--重力属性
+textColor='#FF4A4266';--文字颜色
+text='足迹';--显示的文字
+textSize='12sp';--文字大小
+layout_marginTop='5dp';--布局顶距
+};
+};
+};
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_width='12%w';--布局宽度
+layout_height='12%h';--布局高度
+layout_marginLeft='6%w';--布局底距
+{
+LinearLayout;
+id="dh";
+orientation='vertical';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+{
+ImageView;--图片控件
+src='img/Wikipedia.png';--图片路径
+layout_width='12%w';--图片宽度
+layout_height='12%w';--图片高度
+scaleType='fitXY';--图片显示类型
+};
+{
+TextView;--文本控件
+layout_width='12%w';--文本宽度
+layout_height='12%w';--文本高度
+gravity='center';--重力属性
+textColor='#FF4A4266';--文字颜色
+text='导航';--显示的文字
+textSize='12sp';--文字大小
+layout_marginTop='5dp';--布局顶距
+};
+};
+};
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_width='12%w';--布局宽度
+layout_height='12%h';--布局高度
+layout_marginLeft='6%w';--布局底距
+{
+LinearLayout;
+id="sq";
+orientation='vertical';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+{
+ImageView;--图片控件
+src='img/shuqian.png';--图片路径
+layout_width='12%w';--图片宽度
+layout_height='12%w';--图片高度
+scaleType='fitXY';--图片显示类型
+};
+{
+TextView;--文本控件
+layout_width='12%w';--文本宽度
+layout_height='12%w';--文本高度
+gravity='center';--重力属性
+textColor='#FF4A4266';--文字颜色
+text='书签';--显示的文字
+textSize='12sp';--文字大小
+layout_marginTop='5dp';--布局顶距
+};
+};
+};
+};
+--底部文本布局
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+{
+TextView;--文本控件
+layout_width='fill';--文本宽度
+layout_height='fill';--文本高度
+gravity='center|top';--重力属性
+textColor='#FF342DF5';--文字颜色
+text='极速/n智能';--显示的文字
+textSize='20sp';--文字大小
+};
+};
+};
+--浏览布局结束
+--阅读布局
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+{
+LuaWebView;--浏览器控件
+id="web";
+layout_width='fill';--浏览器宽度
+layout_height='fill';--浏览器高度
+};--重写浏览器控件,当然网页控制就没用了啦
+};        
+--阅读布局结束
+--翻译布局
+{
+LinearLayout;
+orientation='vertical';--重力属性
+layout_width='fill';--布局宽度
+layout_height='fill';--布局高度
+{
+LuaWebView;--浏览器控件
+id="we";
+layout_width='fill';--浏览器宽度
+layout_height='fill';--浏览器高度
+};--重写浏览器控件,当然网页控制就没用了啦
+};        
+--翻译布局结束
+};
+};
+};
+webView.addView(loadlayout(shamrock))
+
+--shamrock殇高仿一个非 Material Design 的酷安 v8 概念设计
+--纯模板
+--原帖链接:https://www.coolapk.com/feed/3944377?shareKey=NGMxYjY2NDg0MzUxNWM0ZDdhMTU~&shareUid=1971736&shareFrom=com.coolapk.market_9.0.1
+--也就是和风所仿的,听说有人需要所以……
+--本人小白,擅长写bug,本来可以早点完工,但在布局助手写到软件崩溃好几次😭😭
+--主页面模板,功能自己发挥吧。
+--现在原创布局也难做了,本人无脑只会模仿
+--如果您有或者看到什么好界面布局欢迎截图给我啾啾,带上素材,或许轻函下个版本会采用😊
+--有bug请联系我：2215149392
+--或者加群：835500026
+
+--界面设置
+--初始化浏览器,加载网页
+web.loadUrl("https://www.yuque.com/u589148/sc")
+
+状态栏亮色()
+--当状态栏颜色是白色时，可以用这个代码把状态栏的字体和图标设置为黑色
+--支持安卓6.0以上
+
+导航栏颜色("#FFFFFF")
+
+--设置字体颜色
+appp=activity.getWidth()
+local kuan=appp/10
+hua.setOnPageChangeListener(PageView.OnPageChangeListener{
+  onPageScrolled=function(a,b,c)
+    if c==0 then
+      if a==0 then--首页
+        文本颜色(a1,0xFF000000)--选中字体颜色
+        文本颜色(a2,0xFF6A6A6A)--未选中字体颜色
+        文本颜色(a3,0xFF6A6A6A)--未选中字体颜色
+        文本颜色(a4,0xFF6A6A6A)--未选中字体颜色
+      elseif a==1 then--浏览
+        文本颜色(a1,0xFF6A6A6A)--未选中字体颜色
+        文本颜色(a2,0xFF000000)--选中字体颜色
+        文本颜色(a3,0xFF6A6A6A)--未选中字体颜色
+        文本颜色(a4,0xFF6A6A6A)--未选中字体颜色
+      elseif a==2 then--阅读
+        文本颜色(a1,0xFF6A6A6A)--未选中字体颜色
+        文本颜色(a2,0xFF6A6A6A)--未选中字体颜色
+        文本颜色(a3,0xFF000000)--选中字体颜色
+        文本颜色(a4,0xFF6A6A6A)--未选中字体颜色
+      elseif a==3 then--翻译
+        文本颜色(a1,0xFF6A6A6A)--未选中字体颜色
+        文本颜色(a2,0xFF6A6A6A)--未选中字体颜色
+        文本颜色(a3,0xFF6A6A6A)--未选中字体颜色
+        文本颜色(a4,0xFF000000)--选中字体颜色
+      end--选中字体颜色与未选中字体颜色建议一致比较统一
+    end
+  end
+})
+
+--设置按钮切换界面
+shouye.onClick=function()
+  hua.showPage(0)
+end
+liulan.onClick=function()
+  hua.showPage(1)
+end
+yuedu.onClick=function()
+  hua.showPage(2)
+end
+fanyi.onClick=function()
+  hua.showPage(4)
+end
+
+波纹(a1,0xFF342DF5)
+波纹(a2,0xFF342DF5)
+波纹(a3,0xFF342DF5)
+波纹(a4,0xFF342DF5)
+波纹(zc,0xFF41CBF7)
+波纹(zi,0xFF41CBF7)
+波纹(zy,0xFF41CBF7)
+
+--重写返回键
+参数=0
+function onKeyDown(key,event)
+  if(key==4)then
+    if(web.canGoBack())then
+      web.goBack()
+    else
+      if 参数+2 > tonumber(os.time()) then 
+        退出程序()
+      else
+        hua.showPage(0)--切换到首页
+        MD提示("请再按一次返回","#FF41CBF7","#ffffffff","0","20")
+        参数=tonumber(os.time()) 
+      end
+    end
+    return true
+  end
+end
+
+
+
+--侧滑栏
+--程序启动时会执行的事件
+--导入自制封装中文函数库
+require 'mods.shamrock'
+shamrock=
+{
+  LinearLayout;
+  orientation='vertical';--重力属性
+  layout_width='70%w';--布局宽度
+  layout_height='1000%h';--布局高度
+  background='#FFFFFFFF';--布局背景颜色(或者图片路径)
+  {
+    LinearLayout;
+    orientation='horizontal';--重力属性
+    layout_width='fill';--布局宽度
+    {
+      CircleImageView;--圆形图片
+      id='imag';
+      src='drawable/touxiang.png';--图片路径
+      layout_width='50dp';--图片宽度
+      layout_height='50dp';--图片高度
+      layout_margin='16dp';--布局边距
+      Elevation='4dp';--阴影属性
+    };
+    {
+      TextView;--文本控件
+      id='denglu';
+      layout_gravity='center';--重力属性
+      textColor='#FF000000';--文字颜色
+      text='“ScBox”自是年少。';--显示的文字
+      textSize='16sp';--文字大小
+    };
+    {
+      ImageView;--图片控件
+      id='vipicon';
+      src='drawable/vip_logo.png';--图片路径
+      layout_marginTop='2.5%h';--布局顶距
+      layout_marginLeft='2%w';--布局左距
+    };
+  };
+  {
+    LinearLayout;
+    orientation='vertical';--重力属性
+    layout_width='fill';
+{
+LinearLayout;--线性布局
+orientation='vertical';--布局的方向
+layout_width='fill';--布局宽度
+layout_height='1dp';--布局高度
+layout_marginBottom='8dp';--布局底距
+background='#ffeeefef';--布局背景颜色(或者图片路径)
+};
+  };
+  {
+    ScrollView,--纵向滚动
+    layout_width='fill';--宽
+    layout_height='fill';--高
+    layout_marginTop="-8dp";
+    verticalScrollBarEnabled=false;--去除右侧滑条
+    {
+      LinearLayout;
+      orientation='vertical';--重力属性
+      layout_width='fill';--布局宽度
+      layout_height='fill';--布局高度
+      {
+        TextView;--文本控件
+        layout_width='fill';--文本宽度
+        gravity='left';--重力属性
+        textColor='#FF41CBF7';--文字颜色
+        text='App介绍';--显示的文字
+        textSize='13sp';--文字大小
+        layout_marginTop='10dp';--布局顶距
+        layout_marginLeft='4%w';--布局左距
+      };
+      {
+        LinearLayout;
+        orientation='vertical';--重力属性
+        layout_width='fill';--布局宽度
+        layout_height='fill';--布局高度
+        {
+          RelativeLayout;--相对布局
+          layout_marginTop='10dp';--布局顶距
+          layout_width='fill';--布局宽度
+          layout_height='fill';--布局高度
+          {
+            LinearLayout;
+            layout_width='fill';--布局宽度
+            layout_height='50dp';--布局高度
+            background='#FFFFFFFF';--布局背景颜色(或者图片路径)
+            {
+              LinearLayout;
+              id='xgj';
+              layout_width='fill';--布局宽度
+              layout_height='fill';--布局高度
+              {
+                ImageView;--图片控件
+                src='drawable/paper_airplane.png';--图片路径
+                layout_marginTop='10dp';--布局顶距
+                layout_marginLeft='10dp';--布局左距
+                layout_width='30dp';--图片宽度
+                layout_height='30dp';--图片高度
+                ColorFilter='#FF5D6EFF';--图片着色
+              };
+              {
+                TextView;--文本控件
+                layout_marginLeft='40dp';--布局左距
+                layout_gravity='center';--重力属性
+                textColor='#000000';--文字颜色
+                text='百度贴吧';--显示的文字
+              };
+            };
+          }; 
+          {
+            LinearLayout;
+            layout_marginTop='50dp';--布局顶距
+            layout_width='fill';--布局宽度
+            layout_height='50dp';--布局高度
+            background='#FFFFFFFF';--布局背景颜色(或者图片路径)
+            {
+              LinearLayout;
+              id='xxyl';
+              layout_width='fill';--布局宽度
+              layout_height='fill';--布局高度
+              {
+                ImageView;--图片控件
+                src='drawable/paper_birplane.png';--图片路径
+                layout_marginTop='10dp';--布局顶距
+                layout_marginLeft='10dp';--布局左距
+                layout_width='30dp';--图片宽度
+                layout_height='30dp';--图片高度
+                ColorFilter='#FF5D6EFF';--图片着色
+              };
+              {
+                TextView;--文本控件
+                layout_marginLeft='40dp';--布局左距
+                layout_gravity='center';--重力属性
+                textColor='#000000';--文字颜色
+                text='捐赠名单';--显示的文字
+              };
+            };
+          };
+          {
+            LinearLayout;
+            layout_marginTop='100dp';--布局顶距
+            layout_width='fill';--布局宽度
+            layout_height='50dp';--布局高度
+            background='#FFFFFFFF';--布局背景颜色(或者图片路径)
+            {
+              LinearLayout;
+              id='spxx';
+              layout_width='fill';--布局宽度
+              layout_height='fill';--布局高度
+              {
+                ImageView;--图片控件
+                src='drawable/rellphone.png';--图片路径
+                layout_marginTop='10dp';--布局顶距
+                layout_marginLeft='10dp';--布局左距
+                layout_width='30dp';--图片宽度
+                layout_height='30dp';--图片高度
+                ColorFilter='#FF5D6EFF';--图片着色
+              };
+              {
+                TextView;--文本控件
+                layout_marginLeft='40dp';--布局左距
+                layout_gravity='center';--重力属性
+                textColor='#000000';--文字颜色
+                text='联系作者';--显示的文字
+              };
+            };
+          };
+          --实用功能
+          {
+            TextView;--文本控件
+            layout_marginTop='209dp';--布局顶距
+            layout_marginLeft='4%w';--布局左距
+            layout_width='fill';--文本宽度
+            gravity='left';--重力属性
+            textColor='#FF41CBF7';--文字颜色
+            text='App功能';--显示的文字
+            textSize='13sp';--文字大小
+          };
+          {
+            LinearLayout;
+            layout_marginTop='230dp';--布局顶距
+            layout_width='fill';--布局宽度
+            layout_height='50dp';--布局高度
+            background='#FFFFFFFF';--布局背景颜色(或者图片路径)
+            {
+              LinearLayout;
+              id='lt';
+              layout_width='fill';--布局宽度
+              layout_height='fill';--布局高度
+              {
+                ImageView;--图片控件
+                src='drawable/kccount_multiple.png';--图片路径
+                layout_marginTop='10dp';--布局顶距
+                layout_marginLeft='10dp';--布局左距
+                layout_width='30dp';--图片宽度
+                layout_height='30dp';--图片高度
+                ColorFilter='#FF5D6EFF';--图片着色
+              };
+              {
+                TextView;--文本控件
+                layout_marginLeft='40dp';--布局左距
+                layout_gravity='center';--重力属性
+                textColor='#000000';--文字颜色
+                text='捐赠';--显示的文字
+              };
+            };
+          };
+          {
+            LinearLayout;
+            layout_marginTop='150dp';--布局顶距
+            layout_width='fill';--布局宽度
+            layout_height='50dp';--布局高度
+            background='#FFFFFFFF';--布局背景颜色(或者图片路径)
+            {
+              LinearLayout;
+              id='dll';
+              layout_width='fill';--布局宽度
+              layout_height='fill';--布局高度
+              {
+                ImageView;--图片控件
+                src='drawable/link_variant.png';--图片路径
+                layout_marginTop='10dp';--布局顶距
+                layout_marginLeft='10dp';--布局左距
+                layout_width='30dp';--图片宽度
+                layout_height='30dp';--图片高度
+                ColorFilter='#FF5D6EFF';--图片着色
+              };
+              {
+                TextView;--文本控件
+                layout_marginLeft='40dp';--布局左距
+                layout_gravity='center';--重力属性
+                textColor='#000000';--文字颜色
+                text='关于';--显示的文字
+              };
+            };
+          };
+          {
+            LinearLayout;
+            layout_marginTop='280dp';--布局顶距
+            layout_width='fill';--布局宽度
+            layout_height='50dp';--布局高度
+            background='#FFFFFFFF';--布局背景颜色(或者图片路径)
+            {
+              LinearLayout;
+              id='Google';
+              layout_width='fill';--布局宽度
+              layout_height='fill';--布局高度
+              {
+                ImageView;--图片控件
+                src='drawable/Google.png';--图片路径
+                layout_marginTop='10dp';--布局顶距
+                layout_marginLeft='10dp';--布局左距
+                layout_width='30dp';--图片宽度
+                layout_height='30dp';--图片高度
+                ColorFilter='#FF5D6EFF';--图片着色
+              };
+              {
+                TextView;--文本控件
+                layout_marginLeft='40dp';--布局左距
+                layout_gravity='center';--重力属性
+                textColor='#000000';--文字颜色
+                text='主题';--显示的文字
+              };
+            };
+          };
+          {
+            LinearLayout;
+            layout_marginTop='330dp';--布局顶距
+            layout_width='fill';--布局宽度
+            layout_height='50dp';--布局高度
+            background='#FFFFFFFF';--布局背景颜色(或者图片路径)
+            {
+              LinearLayout;
+              id='zdy';
+              layout_width='fill';--布局宽度
+              layout_height='fill';--布局高度
+              {
+                ImageView;--图片控件
+                src='drawable/invert_colors.png';--图片路径
+                layout_marginTop='10dp';--布局顶距
+                layout_marginLeft='10dp';--布局左距
+                layout_width='30dp';--图片宽度
+                layout_height='30dp';--图片高度
+                ColorFilter='#FF5D6EFF';--图片着色
+              };
+              {
+                TextView;--文本控件
+                layout_marginLeft='40dp';--布局左距
+                layout_gravity='center';--重力属性
+                textColor='#000000';--文字颜色
+                text='反馈';--显示的文字
+              };
+            };
+          };
+          {
+            LinearLayout;
+            layout_marginTop='380dp';--布局顶距
+            layout_width='fill';--布局宽度
+            layout_height='50dp';--布局高度
+            background='#FFFFFFFF';--布局背景颜色(或者图片路径)
+            {
+              LinearLayout;
+              id='gy';
+              layout_width='fill';--布局宽度
+              layout_height='fill';--布局高度
+              {
+                ImageView;--图片控件
+                src='drawable/information_outline.png';--图片路径
+                layout_marginTop='10dp';--布局顶距
+                layout_marginLeft='10dp';--布局左距
+                layout_width='30dp';--图片宽度
+                layout_height='30dp';--图片高度
+                ColorFilter='#FF5D6EFF';--图片着色
+              };
+              {
+                TextView;--文本控件
+                layout_marginLeft='40dp';--布局左距
+                layout_gravity='center';--重力属性
+                textColor='#000000';--文字颜色
+                text='关于';--显示的文字
+              };
+            };
+          };
+        {
+            LinearLayout;
+            layout_marginTop='380dp';--布局顶距
+            layout_width='fill';--布局宽度
+            layout_height='50dp';--布局高度
+            background='#FFFFFFFF';--布局背景颜色(或者图片路径)
+            {
+              LinearLayout;
+              id='gk';
+              layout_width='fill';--布局宽度
+              layout_height='fill';--布局高度
+              {
+                ImageView;--图片控件
+                src='drawable/information_putline.png';--图片路径
+                layout_marginTop='10dp';--布局顶距
+                layout_marginLeft='10dp';--布局左距
+                layout_width='30dp';--图片宽度
+                layout_height='30dp';--图片高度
+                ColorFilter='#FF5D6EFF';--图片着色
+              };
+              {
+                TextView;--文本控件
+                layout_marginLeft='40dp';--布局左距
+                layout_gravity='center';--重力属性
+                textColor='#000000';--文字颜色
+                text='退出';--显示的文字
+              };
+            };
+          };
+        };
+      };
+    };
+  };
+};--侧滑栏全局布局结束
+sidebar.addView(loadlayout(shamrock))
+
+--调用波纹函数
+波纹(xgj,0xFF41CBF7)--小工具
+波纹(xxyl,0xFF41CBF7)--休闲娱乐
+波纹(spxx,0xFF41CBF7)--设备信息
+波纹(dll,0xFF41CBF7)--短链接
+波纹(lt,0xFF41CBF7)
+波纹(Google,0xFF41CBF7)--Google搜索
+波纹(zdy,0xFF41CBF7)--自定义颜色
+波纹(gy,0xFF41CBF7)--关于轻函
+
+--项目点击事件
+xgj.onClick=function()
+  进入子页面("17")弹出消息("欢迎加入该贴吧，本贴吧提供生存战争&插件版和各种mod更新的最新消息。")
+end
+xxyl.onClick=function()
+  进入子页面("30")弹出消息("还暂时没有人捐。")
+end
+spxx.onClick=function()
+  联系QQ(3510876997)弹出消息("有什么重要的事，可直接联系我。")
+end
+lt.onClick=function()
+  进入子页面("11")弹出消息("请我们喝可乐，将助力我们将盒子做的更好。感谢捐赠!")
+end
+Google.onClick=function()
+  activity.newActivity("showTheme.lua")
+弹出消息("建议换成贴吧蓝!")
+弹出消息("不要换成白色，否则将看不清字体。")
+弹出消息("制作者忠心告诫。")
+end
+dll.onClick=function()
+  进入子页面("8")弹出消息("我们共同了解！")
+end
+gk.onClick=function()
+  退出程序()
+end
+zdy.onClick=function()
+  进入子页面("9")弹出消息("为什么问题请尽快反馈。")
+end
